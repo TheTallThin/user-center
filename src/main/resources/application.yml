@@ -1,7 +1,12 @@
-
 server:
   port: 8082
 
+
+logging:
+  config: classpath:spring-logback.xml
+  level:
+    # 为了解决代码加入了spring cloud stream,则疯狂打印nacos的日志
+    com.alibaba.nacos: error
 
 spring:
   datasource:
@@ -18,11 +23,35 @@ spring:
         server-addr: localhost:8848
         # 指定集群名称
         cluster-name: BJ
+#------------------------spring cloud stream 配置（MQ消费者）--------------------
+    stream:
+      rocketmq:
+        binder:
+          name-server: 127.0.0.1:9876
+      bindings:
+        input:
+          # 跟内容中心配置的topic 要一样
+          destination: add-bonus
+          # 随便写（如果用的是RocketMQ一定要设置，不然启动不起来）
+          # 如果用的是其他MQ,可留空
+          group: binder-group
+        # my-input 和类MySource 里面的MY_OUTPUT 一致
+#        my-input:
+#          destination: stream-my-topic
+#          # 随便写（如果用的是RocketMQ一定要设置，不然启动不起来）
+#          # 如果用的是其他MQ,可留空
+#          group: my-group
   application:
     # 服务名称尽量用-，不要用_，不要用特殊字符
     name: user-center
 
+#--------------------------rocket mq 配置--------------------------
+#rocketmq:
+#  name-server: 127.0.0.1:9876
 
-
-
-
+#------------------------jwt(用户加密token)---------------------
+jwt:
+  # 秘钥
+  secret: abcdefg
+  # 有效期，单位秒，默认2周
+  expire-time-in-second: 1209600
